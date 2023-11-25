@@ -8,13 +8,13 @@ on:
 
 # 動作バージョンの指定
 env:
- DEVELOPER_DIR: /Applications/Xcode_13.2.1.app
+ DEVELOPER_DIR: /Applications/Xcode_15.1.app
 
 
 
 jobs:
   UnitTestResult:
-    runs-on: macos-11 # 仮想環境指定（Windows Server, Ubuntu, Mac OSをサポートする）
+    runs-on: macos-latest # 仮想環境指定（Windows Server, Ubuntu, Mac OSをサポートする）
 
     steps:
     # ソースコードを取得する
@@ -43,13 +43,13 @@ jobs:
           -configuration Debug
           -workspace github-actions-xcode-test.xcworkspace
           -scheme github-actions-xcode-test
-          -destination 'platform=iOS Simulator,name=iPhone 11 Pro Max'
+          -destination 'platform=iOS Simulator,name=iPhone 15'
           -skip-testing:univIPUITests
           clean test
 
 
   info:
-    runs-on: macos-11
+    runs-on: macos-latest
 
     steps:
     # チェックアウト
