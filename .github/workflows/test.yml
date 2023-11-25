@@ -17,7 +17,7 @@ jobs:
           xcode-version: '15.0.1'
 
       - name: UnitTests
-        run: xcodebuild test -project github-actions-xcode-test.xcodeproj -scheme github-actions-xcode-test -sdk iphonesimulator -destination platform='iOS Simulator,name=iPhone 15,OS=17.0.1'
+        run: xcodebuild test -project github-actions-xcode-test.xcodeproj -scheme github-actions-xcode-test -sdk iphonesimulator -destination platform='iOS Simulator,name=iPhone 14,OS=16.2'
   info:
     runs-on: macos-latest
 
@@ -25,13 +25,13 @@ jobs:
     # チェックアウト
 #    - uses: actions/checkout@v1
 #
-#    # Xcodeの一覧出力
-#    - name: Show Xcode list
-#      run: ls /Applications | grep 'Xcode'
-#
-#    # Xcodeのバージョン出力
-#    - name: Show Xcode version
-#      run: xcodebuild -version
+    # Xcodeの一覧出力
+    - name: Show Xcode list
+      run: ls /Applications | grep 'Xcode'
+
+    # Xcodeのバージョン出力
+    - name: Show Xcode version
+      run: xcodebuild -version
 
     # 端末の一覧出力
     - name: Show devices
