@@ -2,23 +2,92 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main, feature/* ]
+    branches:
+      - main
+      - develop
 
-  workflow_dispatch:
+# 動作バージョンの指定
+env:
+ DEVELOPER_DIR: /Applications/Xcode_13.2.1.app
+
+
 
 jobs:
-  build:
-    runs-on: macOS-latest
+  UnitTestResult:
+    runs-on: macos-11 # 仮想環境指定（Windows Server, Ubuntu, Mac OSをサポートする）
 
     steps:
-      - uses: actions/checkout@v3
+    # ソースコードを取得する
+    - uses: actions/checkout@v1
 
-      - name: Test
-        run: xcodebuild test -project github-actions-xcode-test.xcodeproj/ -scheme github-actions-xcode-test -resultBundlePath TestResults -sdk iphonesimulator -destination "platform=iOS Simulator,name=iPhone 14"
+    # キャッシュ
+#    - name: Cache CocoaPods files
+#      uses: actions/cache@v1
+#      with:
+#        path: Pods
+#        key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
+#        restore-keys: |
+#          ${{ runner.os }}-pods-
 
-      - uses: kishikawakatsumi/xcresulttool@v1
-        with:
-          path: TestResults.xcresult
-        if: success() || failure()
+    # CocoaPodsをインストールする
+#    - name: CocoaPods
+#      run: pod install
+
+    # シミュレーター向けにビルド
+    # set -o pipefail (エラー発生時終了)
+    # bundle exec xcpretty --report html (エラー文を整形)
+    - name: Xcode UnitTest
+      run: set -o pipefail &&
+          xcodebuild
+          -sdk iphonesimulator
+          -configuration Debug
+          -workspace github-actions-xcode-test.xcworkspace
+          -scheme github-actions-xcode-test
+          -destination 'platform=iOS Simulator,name=iPhone 11 Pro Max'
+          -skip-testing:univIPUITests
+          clean test
+
+
+  info:
+    runs-on: macos-11
+
+    steps:
+    # チェックアウト
+    - uses: actions/checkout@v1
+
+    # Xcodeの一覧出力
+    - name: Show Xcode list
+      run: ls /Applications | grep 'Xcode'
+
+    # Xcodeのバージョン出力
+    - name: Show Xcode version
+      run: xcodebuild -version
+
+    # 端末の一覧出力
+    - name: Show devices
+      run: xcrun xctrace list devices
+
+#name: CI
+#
+#on:
+#  push:
+#    branches: [ main ]
+#  pull_request:
+#    branches: [ main, feature/* ]
+#
+#  workflow_dispatch:
+#
+#jobs:
+#  build:
+#    runs-on: macOS-latest
+#
+#    steps:
+#      - uses: actions/checkout@v3
+#
+#      - name: Test
+#        run: xcodebuild test -project github-actions-xcode-test.xcodeproj/ -scheme github-actions-xcode-test -resultBundlePath TestResults -sdk iphonesimulator -destination "platform=iOS Simulator,name=iPhone 14"
+#
+#      - uses: kishikawakatsumi/xcresulttool@v1
+#        with:
+#          path: TestResults.xcresult
+#        if: success() || failure()
