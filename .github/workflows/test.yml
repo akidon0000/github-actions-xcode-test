@@ -19,7 +19,7 @@ jobs:
         gem install cocoapods
         pod install
     - name: Run Unit Tests
-      run: xcodebuild test -workspace YourWorkspace.xcworkspace -scheme YourScheme -destination 'platform=iOS Simulator,name=iPhone 13,OS=15.0'
+      run: xcodebuild test -workspace github-actions-xcode-test.xcworkspace -scheme github-actions-xcode-test -destination 'platform=iOS Simulator,name=iPhone 13,OS=15.0'
 
 
 #name: CI
