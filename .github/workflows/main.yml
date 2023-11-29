@@ -27,18 +27,18 @@ jobs:
     - name: Show Xcode version
       run: xcodebuild -version
 
-    # CocoaPodsで管理しているライブラリのキャッシュ
-    - name: Cache Pods
-      uses: actions/cache@v2
-      with:
-        path: Pods
-        key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-pods-
+#    # CocoaPodsで管理しているライブラリのキャッシュ
+#    - name: Cache Pods
+#      uses: actions/cache@v2
+#      with:
+#        path: Pods
+#        key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
+#        restore-keys: |
+#          ${{ runner.os }}-pods-
 
     # CocoaPodsをインストールする
     - name: CocoaPods
-      run: bundle exec pod install
+      run: pod install
 
     # ビルド
     - name: Xcode build
