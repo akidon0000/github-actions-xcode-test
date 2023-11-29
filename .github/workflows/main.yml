@@ -26,7 +26,12 @@ jobs:
     # Xcodeのバージョン出力
     - name: Show Xcode version
       run: xcodebuild -version
-
+      
+    # Gemsのインストール
+    - name: Install Bundled Gems
+      run: |
+        bundle config path vendor/bundle
+        bundle install --jobs 4 --retry 3
 #    # CocoaPodsで管理しているライブラリのキャッシュ
 #    - name: Cache Pods
 #      uses: actions/cache@v2
