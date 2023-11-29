@@ -54,7 +54,6 @@ jobs:
         -workspace github-actions-xcode-test.xcworkspace
         -scheme github-actions-xcode-test
         build
-        | bundle exec xcpretty
 
     # 単体テストの実行
     - name: Xcode test
