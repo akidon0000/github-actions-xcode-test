@@ -32,7 +32,7 @@ env:
  SKIP_TESTING_NAME: github-actions-xcode-testUITests
 
 jobs:
-  build:
+  test:
     name: build for ${{ matrix.environment }}
     runs-on: env.OS
     strategy:
