@@ -5,8 +5,6 @@ on: [push]
 jobs:
   test:
     runs-on: macos-13
-    strategy:
-      fail-fast: false
 
     steps:
     # チェックアウト
@@ -60,35 +58,35 @@ jobs:
 #        if-no-files-found: ignore
 #        retention-days: 14
 
-  show-test-results:
-    runs-on: macos-13
-    permissions:
-      checks: write
-    needs: test
-
-    steps:
-    # チェックアウト
-    - uses: actions/checkout@v3
-
-    # テスト結果のダウンロード
-    - name: Download test results artifact
-      uses: actions/download-artifact@v3
-      with:
-        name: test-results
-        path: Reports
-
-    # テスト結果のマージ
-    - name: Merge test results
-      run: make merge-test-results
-
-    # テスト結果の表示とアップロード
-    - uses: kishikawakatsumi/xcresulttool@v1
-      if: success() || failure()
-      with:
-        path: Reports/TestResults.xcresult
-          Reports/*_Test.log
-        if-no-files-found: ignore
-        retention-days: 14
+#  show-test-results:
+#    runs-on: macos-13
+#    permissions:
+#      checks: write
+#    needs: test
+#
+#    steps:
+#    # チェックアウト
+#    - uses: actions/checkout@v3
+#
+#    # テスト結果のダウンロード
+#    - name: Download test results artifact
+#      uses: actions/download-artifact@v3
+#      with:
+#        name: test-results
+#        path: Reports
+#
+#    # テスト結果のマージ
+#    - name: Merge test results
+#      run: make merge-test-results
+#
+#    # テスト結果の表示とアップロード
+#    - uses: kishikawakatsumi/xcresulttool@v1
+#      if: success() || failure()
+#      with:
+#        path: Reports/TestResults.xcresult
+#          Reports/*_Test.log
+#        if-no-files-found: ignore
+#        retention-days: 14
 
   info:
     runs-on: macos-13
