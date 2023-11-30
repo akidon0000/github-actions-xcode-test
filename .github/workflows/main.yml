@@ -37,6 +37,14 @@ jobs:
         retention-days: 14
 
   test:
+    name: build for ${{ matrix.environment }}
+    runs-on: macos-13
+    strategy:
+      fail-fast: false
+      matrix:
+        environment: ["main"]
+
+    steps:
     # CocoaPodsをインストールする
     - name: CocoaPods
       run: pod install
