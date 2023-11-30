@@ -2,13 +2,30 @@ name: CI
 
 on: [push]
 
+# 動作バージョンの指定
+env:
+ DEVELOPER_DIR: /Applications/Xcode_15.0.app
+
 jobs:
-  test:
+  build:
+    name: build for ${{ matrix.environment }}
     runs-on: macos-13
+    strategy:
+      fail-fast: false
+      matrix:
+        environment: ["main"]
 
     steps:
     # チェックアウト
     - uses: actions/checkout@v3
+
+    # Xcodeの一覧出力
+    - name: Show Xcode list
+      run: ls /Applications | grep 'Xcode'
+
+    # Xcodeのバージョン出力
+    - name: Show Xcode version
+      run: xcodebuild -version
 
     # CocoaPodsをインストールする
     - name: CocoaPods
@@ -35,58 +52,6 @@ jobs:
         -destination 'platform=iOS Simulator,name=iPhone 15 Pro Max'
         -skip-testing:github-actions-xcode-testUITests
         clean test
-
-#    # テスト結果のアップロード
-#    - name: Upload test results Artifact
-#      uses: actions/upload-artifact@v3
-#      if: success() || failure()
-#      with:
-#        name: test-results
-#        path: |
-#          Reports/*.xcresult
-#        if-no-files-found: error
-#        retention-days: 14
-#
-#    # 単体テストログのアップロード
-#    - name: Upload test log Artifact
-#      uses: actions/upload-artifact@v3
-#      if: failure()
-#      with:
-#        name: xcodebuild-logs
-#        path: |
-#          Reports/*_Test.log
-#        if-no-files-found: ignore
-#        retention-days: 14
-
-#  show-test-results:
-#    runs-on: macos-13
-#    permissions:
-#      checks: write
-#    needs: test
-#
-#    steps:
-#    # チェックアウト
-#    - uses: actions/checkout@v3
-#
-#    # テスト結果のダウンロード
-#    - name: Download test results artifact
-#      uses: actions/download-artifact@v3
-#      with:
-#        name: test-results
-#        path: Reports
-#
-#    # テスト結果のマージ
-#    - name: Merge test results
-#      run: make merge-test-results
-#
-#    # テスト結果の表示とアップロード
-#    - uses: kishikawakatsumi/xcresulttool@v1
-#      if: success() || failure()
-#      with:
-#        path: Reports/TestResults.xcresult
-#          Reports/*_Test.log
-#        if-no-files-found: ignore
-#        retention-days: 14
 
   info:
     runs-on: macos-13
