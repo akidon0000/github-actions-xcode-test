@@ -1,42 +1,12 @@
-# github-actions-xcode-test
 name: CI
 
-# CIを回すタイミングは「branches:」にpushされた時 ＆ pull_request作成時。
-#「paths-ignore:」の変更時はCIを回さない。
-#「workflow_dispatch:」はGitHubのUIから手動でワークフローを起動するため。
-on:
-  push:
-    branches:
-      - main
-      - develop
-    paths-ignore:
-      - Docs/**
-      - README.md
-      - LICENSE
-  pull_request:
-    paths-ignore:
-      - Docs/**
-      - README.md
-      - LICENSE
-  workflow_dispatch:
-
-# 環境変数の設定(何か触るならここを触って)
-env:
- OS: macos-13
- DEVELOPER_DIR: /Applications/Xcode_15.0.app
- PLATFORM: iOS Simulator
- PLATFORM_NAME: iPhone 15 Pro Max
- PROJECT_NAME: github-actions-xcode-test
- PROJECT_WORKSPACE: github-actions-xcode-test.xcworkspace
- PROJECT_SCHEME: github-actions-xcode-test
- SKIP_TESTING_NAME: github-actions-xcode-testUITests
+on: [push]
 
 jobs:
-  test:
+  build:
     name: build for ${{ matrix.environment }}
-    runs-on: ${{ env.OS }}
+    runs-on: macos-13
     strategy:
-      # 一つのジョブが失敗しても、他のジョブがキャンセルされないように
       fail-fast: false
       matrix:
         environment: ["main"]
@@ -63,8 +33,8 @@ jobs:
         xcodebuild
         -sdk iphonesimulator
         -configuration Debug
-        -workspace ${{ env.PROJECT_WORKSPACE }}
-        -scheme ${{ env.PROJECT_SCHEME }}
+        -workspace github-actions-xcode-test.xcworkspace
+        -scheme github-actions-xcode-test
         build
 
     # 単体テストの実行
@@ -73,10 +43,10 @@ jobs:
         xcodebuild
         -sdk iphonesimulator
         -configuration Debug
-        -workspace ${{ env.PROJECT_WORKSPACE }}
-        -scheme ${{ env.PROJECT_SCHEME }}
-        -destination 'platform=${{ env.PLATFORM }},name=${{ env.PLATFORM_NAME }}'
-        -skip-testing:${{ env.SKIP_TESTING_NAME }}
+        -workspace github-actions-xcode-test.xcworkspace
+        -scheme github-actions-xcode-test
+        -destination 'platform=iOS Simulator,name=iPhone 15 Pro Max'
+        -skip-testing:github-actions-xcode-testUITests
         clean test
 
     # テスト結果のアップロード
@@ -97,6 +67,36 @@ jobs:
       with:
         name: xcodebuild-logs
         path: |
+          Reports/*_Test.log
+        if-no-files-found: ignore
+        retention-days: 14
+
+  show-test-results:
+    runs-on: macos-13
+    permissions:
+      checks: write
+    needs: test
+
+    steps:
+    # チェックアウト
+    - uses: actions/checkout@v3
+
+    # テスト結果のダウンロード
+    - name: Download test results artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: test-results
+        path: Reports
+
+    # テスト結果のマージ
+    - name: Merge test results
+      run: make merge-test-results
+
+    # テスト結果の表示とアップロード
+    - uses: kishikawakatsumi/xcresulttool@v1
+      if: success() || failure()
+      with:
+        path: Reports/TestResults.xcresult
           Reports/*_Test.log
         if-no-files-found: ignore
         retention-days: 14
