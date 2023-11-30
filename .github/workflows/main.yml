@@ -34,7 +34,7 @@ env:
 jobs:
   test:
     name: build for ${{ matrix.environment }}
-    runs-on: env.OS
+    runs-on: ${{ env.OS }}
     strategy:
       # 一つのジョブが失敗しても、他のジョブがキャンセルされないように
       fail-fast: false
@@ -63,8 +63,8 @@ jobs:
         xcodebuild
         -sdk iphonesimulator
         -configuration Debug
-        -workspace env.PROJECT_WORKSPACE
-        -scheme env.PROJECT_SCHEME
+        -workspace ${{ env.PROJECT_WORKSPACE }}
+        -scheme ${{ env.PROJECT_SCHEME }}
         build
 
     # 単体テストの実行
@@ -73,10 +73,10 @@ jobs:
         xcodebuild
         -sdk iphonesimulator
         -configuration Debug
-        -workspace env.PROJECT_WORKSPACE
-        -scheme env.PROJECT_SCHEME
+        -workspace ${{ env.PROJECT_WORKSPACE }}
+        -scheme ${{ env.PROJECT_SCHEME }}
         -destination 'platform=${{ env.PLATFORM }},name=${{ env.PLATFORM_NAME }}'
-        -skip-testing:env.SKIP_TESTING_NAME
+        -skip-testing:${{ env.SKIP_TESTING_NAME }}
         clean test
 
     # テスト結果のアップロード
@@ -102,7 +102,7 @@ jobs:
         retention-days: 14
 
   show-test-results:
-    runs-on: env.OS
+    runs-on: ${{ env.OS
     permissions:
       checks: write
     needs: test
