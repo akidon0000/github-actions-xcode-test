@@ -1,19 +1,45 @@
+# github-actions-xcode-test
 name: CI
 
-on: [push]
+# CIを回すタイミングは「branches:」にpushされた時 ＆ pull_request作成時。
+#「paths-ignore:」の変更時はCIを回さない。
+#「workflow_dispatch:」はGitHubのUIから手動でワークフローを起動するため。
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths-ignore:
+      - Docs/**
+      - README.md
+      - LICENSE
+  pull_request:
+    paths-ignore:
+      - Docs/**
+      - README.md
+      - LICENSE
+  workflow_dispatch:
 
-# 動作バージョンの指定
+# 環境変数の設定(何か触るならここを触って)
 env:
+ OS: macos-13
  DEVELOPER_DIR: /Applications/Xcode_15.0.app
+ PLATFORM: iOS Simulator
+ PLATFORM_NAME: iPhone 15 Pro Max
+ PROJECT_NAME: github-actions-xcode-test
+ PROJECT_WORKSPACE: github-actions-xcode-test.xcworkspace
+ PROJECT_SCHEME: github-actions-xcode-test
+ SKIP_TESTING_NAME: github-actions-xcode-testUITests
 
 jobs:
   build:
     name: build for ${{ matrix.environment }}
-    runs-on: macos-13
+    runs-on: env.OS
     strategy:
+      # 一つのジョブが失敗しても、他のジョブがキャンセルされないように
       fail-fast: false
       matrix:
-        environment: ["main"]
+        environment: ["main","develop"]
 
     steps:
     # チェックアウト
@@ -37,8 +63,8 @@ jobs:
         xcodebuild
         -sdk iphonesimulator
         -configuration Debug
-        -workspace github-actions-xcode-test.xcworkspace
-        -scheme github-actions-xcode-test
+        -workspace env.PROJECT_WORKSPACE
+        -scheme env.PROJECT_SCHEME
         build
 
     # 単体テストの実行
@@ -47,10 +73,10 @@ jobs:
         xcodebuild
         -sdk iphonesimulator
         -configuration Debug
-        -workspace github-actions-xcode-test.xcworkspace
-        -scheme github-actions-xcode-test
-        -destination 'platform=iOS Simulator,name=iPhone 15 Pro Max'
-        -skip-testing:github-actions-xcode-testUITests
+        -workspace env.PROJECT_WORKSPACE
+        -scheme env.PROJECT_SCHEME
+        -destination 'platform=${{ env.PLATFORM }},name=${{ env.PLATFORM_NAME }}'
+        -skip-testing:env.SKIP_TESTING_NAME
         clean test
 
     # テスト結果のアップロード
@@ -76,7 +102,7 @@ jobs:
         retention-days: 14
 
   show-test-results:
-    runs-on: macos-13
+    runs-on: env.OS
     permissions:
       checks: write
     needs: test
