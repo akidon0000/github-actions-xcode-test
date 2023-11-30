@@ -14,14 +14,6 @@ jobs:
     # チェックアウト
     - uses: actions/checkout@v3
 
-    # Xcodeの一覧出力
-    - name: Show Xcode list
-      run: ls /Applications | grep 'Xcode'
-
-    # Xcodeのバージョン出力
-    - name: Show Xcode version
-      run: xcodebuild -version
-
     # CocoaPodsをインストールする
     - name: CocoaPods
       run: pod install
