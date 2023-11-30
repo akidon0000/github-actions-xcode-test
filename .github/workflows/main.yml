@@ -39,7 +39,7 @@ jobs:
       # 一つのジョブが失敗しても、他のジョブがキャンセルされないように
       fail-fast: false
       matrix:
-        environment: ["main","develop"]
+        environment: ["main"]
 
     steps:
     # チェックアウト
