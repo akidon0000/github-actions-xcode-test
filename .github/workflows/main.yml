@@ -3,7 +3,7 @@ name: CI
 on: [push]
 
 jobs:
-  test:
+  build:
     name: build for ${{ matrix.environment }}
     runs-on: macos-13
     strategy:
@@ -15,14 +15,28 @@ jobs:
     # チェックアウト
     - uses: actions/checkout@v3
 
-    # Xcodeの一覧出力
-    - name: Show Xcode list
-      run: ls /Applications | grep 'Xcode'
+    # ビルド
+    - name: Xcode build
+      run: set -o pipefail &&
+        xcodebuild
+        -sdk iphonesimulator
+        -configuration Debug
+        -workspace github-actions-xcode-test.xcworkspace
+        -scheme github-actions-xcode-test
+        build
 
-    # Xcodeのバージョン出力
-    - name: Show Xcode version
-      run: xcodebuild -version
+    # ビルドログのアップロード
+    - name: Upload build log Artifact
+      uses: actions/upload-artifact@v3
+      if: failure()
+      with:
+        name: xcodebuild-logs
+        path: |
+          Reports/*_Build.log
+        if-no-files-found: ignore
+        retention-days: 14
 
+  test:
     # CocoaPodsをインストールする
     - name: CocoaPods
       run: pod install
@@ -100,3 +114,12 @@ jobs:
           Reports/*_Test.log
         if-no-files-found: ignore
         retention-days: 14
+
+  info:
+    # Xcodeの一覧出力
+    - name: Show Xcode list
+      run: ls /Applications | grep 'Xcode'
+
+    # Xcodeのバージョン出力
+    - name: Show Xcode version
+      run: xcodebuild -version
