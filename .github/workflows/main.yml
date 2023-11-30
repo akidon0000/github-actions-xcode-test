@@ -3,39 +3,6 @@ name: CI
 on: [push]
 
 jobs:
-  build:
-    name: build for ${{ matrix.environment }}
-    runs-on: macos-13
-    strategy:
-      fail-fast: false
-      matrix:
-        environment: ["main"]
-
-    steps:
-    # チェックアウト
-    - uses: actions/checkout@v3
-
-    # ビルド
-    - name: Xcode build
-      run: set -o pipefail &&
-        xcodebuild
-        -sdk iphonesimulator
-        -configuration Debug
-        -workspace github-actions-xcode-test.xcworkspace
-        -scheme github-actions-xcode-test
-        build
-
-    # ビルドログのアップロード
-    - name: Upload build log Artifact
-      uses: actions/upload-artifact@v3
-      if: failure()
-      with:
-        name: xcodebuild-logs
-        path: |
-          Reports/*_Build.log
-        if-no-files-found: ignore
-        retention-days: 14
-
   test:
     name: test for ${{ matrix.environment }}
     runs-on: macos-13
