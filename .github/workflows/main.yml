@@ -3,7 +3,7 @@ name: CI
 on: [push]
 
 jobs:
-  build:
+  test:
     name: build for ${{ matrix.environment }}
     runs-on: macos-13
     strategy:
